@@ -1,11 +1,9 @@
 package com.finance.investment.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 import java.util.Set;
@@ -13,6 +11,8 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Data
+@ToString(exclude = {"accounts", "mfaSecret"}) // Exclude secret from toString
+@EqualsAndHashCode(exclude = {"accounts", "mfaSecret"}) // Exclude secret from equals/hashCode
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -27,6 +27,13 @@ public class User {
     @Setter
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private boolean mfaEnabled = false;
+
+    @Column
+    @JsonIgnore // Exclude secret from API responses
+    private String mfaSecret;
 
     @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
